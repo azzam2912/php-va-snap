@@ -1,0 +1,19 @@
+{
+    "name": "azzam/php-va-snap",
+    "description": "Program to handle API pre script for SNAP VA",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Azzam\\PhpVaSnap\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "azzam2912",
+            "email": "azzam.gamers12@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
