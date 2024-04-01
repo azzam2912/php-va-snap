@@ -2,45 +2,70 @@
 
 function getBaseUrl()
 {
-    return 'https://api.doku.com'; // Replace with the actual base URL
+    return 'https://api-uat.doku.com';
 }
 
 function getClientKey()
 {
-    return 'your_merchant_client_key'; // Replace with the actual merchant client key
+    return '';
 }
 
 function getPrivateKey()
 {
-    return 'your_merchant_private_key'; // Replace with the actual merchant private key
+    return '';
 }
 
 function getClientSecret()
 {
-    return 'your_merchant_client_secret'; // Replace with the actual merchant client secret
+    return '';
 }
 
 function getAcquirerClientKey()
 {
-    return 'your_acquirer_client_key'; // Replace with the actual acquirer client key
+    return '';
 }
 
 function getAcquirerPrivateKey()
 {
-    return 'your_acquirer_private_key'; // Replace with the actual acquirer private key
+    return '';
 }
 
 function getAcquirerClientSecret()
 {
-    return 'your_acquirer_client_secret'; // Replace with the actual acquirer client secret
+    return '';
 }
 
 function getPartnerServiceId()
 {
-    return 'your_partner_service_id'; // Replace with the actual partner service ID
+    return '';
 }
 
 function getCustomerNo()
 {
-    return 'your_customer_no'; // Replace with the actual customer number
+    return '';
+}
+
+function getAcquirerAccessToken()
+{
+    return '';
+}
+
+function getAccessToken()
+{
+    return '';
+}
+
+function getVirtualAccountName()
+{
+    return '';
+}
+
+function getInvoiceNumber()
+{
+    return '';
+}
+
+function generateSignatureForRejectPayment($clientKey, $clientSecret, $rejectionReason)
+{
+    return '';
 }

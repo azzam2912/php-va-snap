@@ -14,8 +14,8 @@ class CIMBVAController
 
     public function getTokenForMerchant()
     {
-        $clientKey = getClientKey(); // From config.php
-        $privateKey = getPrivateKey(); // From config.php
+        $clientKey = getClientKey(); 
+        $privateKey = getPrivateKey(); 
         $signature = generateSignatureForGetToken($clientKey, $privateKey);
 
         $response = $this->model->getTokenForMerchant($clientKey, $signature);
@@ -25,9 +25,9 @@ class CIMBVAController
 
     public function createVA()
     {
-        $clientKey = getClientKey(); // From config.php
-        $clientSecret = getClientSecret(); // From config.php
-        $accessToken = getAccessToken(); // From previous response
+        $clientKey = getClientKey(); 
+        $clientSecret = getClientSecret(); 
+        $accessToken = getAccessToken(); 
         $signature = generateSignatureForCreateVA($clientKey, $clientSecret);
 
         $response = $this->model->createVA($clientKey, $accessToken, $signature);
@@ -37,8 +37,8 @@ class CIMBVAController
 
     public function getTokenForAcquirer()
     {
-        $clientKey = getAcquirerClientKey(); // From config.php
-        $privateKey = getAcquirerPrivateKey(); // From config.php
+        $clientKey = getAcquirerClientKey(); 
+        $privateKey = getAcquirerPrivateKey(); 
         $signature = generateSignatureForGetToken($clientKey, $privateKey);
 
         $response = $this->model->getTokenForAcquirer($clientKey, $signature);
@@ -48,12 +48,12 @@ class CIMBVAController
 
     public function inquiry()
     {
-        $clientKey = getAcquirerClientKey(); // From config.php
-        $clientSecret = getAcquirerClientSecret(); // From config.php
-        $accessToken = getAcquirerAccessToken(); // From previous response
+        $clientKey = getAcquirerClientKey(); 
+        $clientSecret = getAcquirerClientSecret(); 
+        $accessToken = getAcquirerAccessToken(); 
         $signature = generateSignatureForInquiry($clientKey, $clientSecret);
 
-        $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); // Acquirer bin length is 4
+        $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); 
         $partnerServiceId = $normalizedVaNumber['partnerServiceId'];
         $customerNo = $normalizedVaNumber['customerNo'];
         $virtualAccountNo = $normalizedVaNumber['virtualAccountNo'];
@@ -65,17 +65,17 @@ class CIMBVAController
 
     public function payment()
     {
-        $clientKey = getAcquirerClientKey(); // From config.php
-        $clientSecret = getAcquirerClientSecret(); // From config.php
-        $accessToken = getAcquirerAccessToken(); // From previous response
+        $clientKey = getAcquirerClientKey(); 
+        $clientSecret = getAcquirerClientSecret(); 
+        $accessToken = getAcquirerAccessToken(); 
         $signature = generateSignatureForPayment($clientKey, $clientSecret);
 
-        $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); // Acquirer bin length is 4
+        $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); 
         $partnerServiceId = $normalizedVaNumber['partnerServiceId'];
         $customerNo = $normalizedVaNumber['customerNo'];
         $virtualAccountNo = $normalizedVaNumber['virtualAccountNo'];
 
-        $virtualAccountName = getVirtualAccountName(); // From inquiry response
+        $virtualAccountName = getVirtualAccountName(); 
 
         $response = $this->model->payment($clientKey, $accessToken, $signature, $partnerServiceId, $customerNo, $virtualAccountNo, $virtualAccountName);
 
@@ -84,9 +84,9 @@ class CIMBVAController
 
     public function createVAMGPC()
     {
-        $clientKey = getClientKey(); // From config.php
-        $clientSecret = getClientSecret(); // From config.php
-        $accessToken = getAccessToken(); // From previous response
+        $clientKey = getClientKey(); 
+        $clientSecret = getClientSecret(); 
+        $accessToken = getAccessToken(); 
         $signature = generateSignatureForCreateVAMGPC($clientKey, $clientSecret);
 
         $response = $this->model->createVAMGPC($clientKey, $accessToken, $signature);
@@ -96,12 +96,12 @@ class CIMBVAController
 
     public function inquiryDirect()
     {
-        $clientKey = getAcquirerClientKey(); // From config.php
-        $clientSecret = getAcquirerClientSecret(); // From config.php
-        $accessToken = getAcquirerAccessToken(); // From previous response
+        $clientKey = getAcquirerClientKey(); 
+        $clientSecret = getAcquirerClientSecret(); 
+        $accessToken = getAcquirerAccessToken(); 
         $signature = generateSignatureForInquiryDirect($clientKey, $clientSecret);
 
-        $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); // Acquirer bin length is 4
+        $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); 
         $partnerServiceId = $normalizedVaNumber['partnerServiceId'];
         $customerNo = $normalizedVaNumber['customerNo'];
         $virtualAccountNo = $normalizedVaNumber['virtualAccountNo'];
@@ -113,17 +113,17 @@ class CIMBVAController
 
     public function rejectPayment($rejectionReason)
     {
-        $clientKey = getAcquirerClientKey(); // From config.php
-        $clientSecret = getAcquirerClientSecret(); // From config.php
-        $accessToken = getAcquirerAccessToken(); // From previous response
+        $clientKey = getAcquirerClientKey(); 
+        $clientSecret = getAcquirerClientSecret(); 
+        $accessToken = getAcquirerAccessToken(); 
         $signature = generateSignatureForRejectPayment($clientKey, $clientSecret, $rejectionReason);
 
-        $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); // Acquirer bin length is 4
+        $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); 
         $partnerServiceId = $normalizedVaNumber['partnerServiceId'];
         $customerNo = $normalizedVaNumber['customerNo'];
         $virtualAccountNo = $normalizedVaNumber['virtualAccountNo'];
 
-        $virtualAccountName = getVirtualAccountName(); // From inquiry response
+        $virtualAccountName = getVirtualAccountName(); 
 
         $response = $this->model->rejectPayment($clientKey, $accessToken, $signature, $partnerServiceId, $customerNo, $virtualAccountNo, $virtualAccountName, $rejectionReason);
 
@@ -132,9 +132,9 @@ class CIMBVAController
 
     public function createVABillVariable()
     {
-        $clientKey = getClientKey(); // From config.php
-        $clientSecret = getClientSecret(); // From config.php
-        $accessToken = getAccessToken(); // From previous response
+        $clientKey = getClientKey(); 
+        $clientSecret = getClientSecret(); 
+        $accessToken = getAccessToken(); 
         $signature = generateSignatureForCreateVABillVariable($clientKey, $clientSecret);
 
         $response = $this->model->createVABillVariable($clientKey, $accessToken, $signature);
@@ -144,9 +144,9 @@ class CIMBVAController
 
     public function createVAMultiBillVariable()
     {
-        $clientKey = getClientKey(); // From config.php
-        $clientSecret = getClientSecret(); // From config.php
-        $accessToken = getAccessToken(); // From previous response
+        $clientKey = getClientKey(); 
+        $clientSecret = getClientSecret(); 
+        $accessToken = getAccessToken(); 
         $signature = generateSignatureForCreateVAMultiBillVariable($clientKey, $clientSecret);
 
         $response = $this->model->createVAMultiBillVariable($clientKey, $accessToken, $signature);
@@ -155,17 +155,17 @@ class CIMBVAController
     }
     public function reversePayment($paymentRequestId)
     {
-        $clientKey = getAcquirerClientKey(); // From config.php
-        $clientSecret = getAcquirerClientSecret(); // From config.php
-        $accessToken = getAcquirerAccessToken(); // From previous response
+        $clientKey = getAcquirerClientKey(); 
+        $clientSecret = getAcquirerClientSecret(); 
+        $accessToken = getAcquirerAccessToken(); 
         $signature = generateSignatureForReversePayment($clientKey, $clientSecret, $paymentRequestId);
 
-        $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); // Acquirer bin length is 4
+        $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); 
         $partnerServiceId = $normalizedVaNumber['partnerServiceId'];
         $customerNo = $normalizedVaNumber['customerNo'];
         $virtualAccountNo = $normalizedVaNumber['virtualAccountNo'];
 
-        $virtualAccountName = getVirtualAccountName(); // From inquiry response
+        $virtualAccountName = getVirtualAccountName(); 
 
         $response = $this->model->reversePayment($clientKey, $accessToken, $signature, $partnerServiceId, $customerNo, $virtualAccountNo, $virtualAccountName, $paymentRequestId);
 
