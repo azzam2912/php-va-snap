@@ -8,7 +8,7 @@ function getTimestamp()
 function generateTimestampWithOffset($offset = '+07:00') {
   $timestamp = new DateTime('now');
   $timestamp->setTimezone(new DateTimeZone($offset));
-  return $timestamp->format('Y-m-d\TH:i:s\Z');
+  return $timestamp->format('Y-m-d\TH:i:s+07:00');
 }
 
 function getExternalId()

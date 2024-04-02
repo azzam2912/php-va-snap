@@ -32,26 +32,26 @@ Mxz+iuYBDeqRKo3q9Du8lzaaEzXu
 ';
 $clientSecret = 'SK-PFACMl2FMX2WltdcuZes';
 $timestamp = getTimestamp();
-echo "Timestamp: " . $timestamp;
+echo "Timestamp: " . $timestamp . "\n";
 $signature = generateSignature($clientKey, $timestamp, $privateKey);
-echo "Generated Signature: " . $signature;
+echo "Generated Signature: " . $signature . "\n";
 $cimbvaModel = new CIMBVAModel($baseUrl);
 
 $accessTokenResponse = $cimbvaModel->getAccessToken($baseUrl, $clientKey, $signature);
 
 if (isset($accessTokenResponse['error'])) 
 {
-  echo "Error getting access token: " . $accessTokenResponse['error'];
+  echo "Error getting access token: " . $accessTokenResponse['error'] . "\n";
   exit;
 }
 
 $accessToken = $accessTokenResponse['accessToken'];
-echo "The Access Token is: " . $accessToken;
+echo "The Access Token is: " . $accessToken . "\n";
 
 $createVAResponse = $cimbvaModel->createVA('BRN-0248-1674717085445', $accessToken, $signature);
 
 if (isset($createVAResponse['error'])) {
-  echo "Error creating VA: " . $createVAResponse['error'];
+  echo "Error creating VA: " . $createVAResponse['error'] . "\n";
   exit;
 }
 
