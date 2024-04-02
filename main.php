@@ -31,10 +31,11 @@ Mxz+iuYBDeqRKo3q9Du8lzaaEzXu
 -----END PRIVATE KEY-----
 ';
 $clientSecret = 'SK-PFACMl2FMX2WltdcuZes';
-
+$timestamp = getTimestamp();
+$signature = generateSignature($clientKey, $timestamp, $privateKey);
 $cimbvaModel = new CIMBVAModel($baseUrl);
 
-$accessTokenResponse = $cimbvaModel->getAccessToken($clientKey, $privateKey);
+$accessTokenResponse = $cimbvaModel->getAccessToken($baseUrl, $clientKey, $signature);
 
 if (isset($accessTokenResponse['error'])) 
 {
@@ -45,13 +46,13 @@ if (isset($accessTokenResponse['error']))
 $accessToken = $accessTokenResponse['accessToken'];
 echo "The Access Token is: " . $accessToken;
 
-// $createVAResponse = $cimbvaModel->createVA($clientKey, $accessToken, $signature);
+$createVAResponse = $cimbvaModel->createVA('BRN-0248-1674717085445', $accessToken, $signature);
 
-// if (isset($createVAResponse['error'])) {
-//   echo "Error creating VA: " . $createVAResponse['error'];
-//   exit;
-// }
+if (isset($createVAResponse['error'])) {
+  echo "Error creating VA: " . $createVAResponse['error'];
+  exit;
+}
 
-// $vaNumber = $createVAResponse['virtualAccountNumber'];
-// echo "Successfully created VA with number: " . $vaNumber;
+$vaNumber = $createVAResponse['virtualAccountNumber'];
+echo "Successfully created VA with number: " . $vaNumber;
 

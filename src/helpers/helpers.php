@@ -7,7 +7,7 @@ function getTimestamp()
 
 function getExternalId()
 {
-    return 'RID_C_' . uniqid();
+    return 'RID_C_' . '20240326101849971';
 }
 
 function getCreateVARequestBody()

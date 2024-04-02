@@ -36,7 +36,7 @@ function getAcquirerClientSecret()
 
 function getPartnerServiceId()
 {
-    return '';
+    return '1899000';
 }
 
 function getCustomerNo()

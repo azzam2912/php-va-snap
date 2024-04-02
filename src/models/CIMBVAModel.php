@@ -41,9 +41,9 @@ class CIMBVAModel
         return $this->makeRequest('POST', $url, $headers, $body);
     }
 
-    function getAccessToken($clientKey, $privateKey)
+    function getAccessToken($url, $clientKey, $signature)
     {
-        $url = "{{base_url_api}}/authorization/v1/access-token/b2b";
+        $url = $url . "/authorization/v1/access-token/b2b";
         $data = array(
             "grantType" => "client_credentials",
             "additionalInfo" => array()
@@ -52,21 +52,15 @@ class CIMBVAModel
         $headers = array(
             "X-CLIENT-KEY: " . $clientKey,
             "X-TIMESTAMP: " . getTimestamp(),
-            "X-SIGNATURE: " . generateSignature($clientKey, $timestamp, $privateKey)
+            "X-SIGNATURE: " . $signature
         );
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $body = json_encode([
+            'grantType' => 'client_credentials',
+            'additionalInfo' => [],
+        ]);
 
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        $responseData = json_decode($response, true);
-        return $responseData;
+        return $this->makeRequest('POST', $url, $headers, $body);
     }
 
     // Add other methods for inquiry and payment
@@ -86,10 +80,14 @@ class CIMBVAModel
         $response = curl_exec($curl);
         $error = curl_error($curl);
 
+        echo "response " . $response;
+
         curl_close($curl);
 
         if ($error) {
+            echo "ERRORRRR";
             return ['error' => $error];
+
         }
 
         return json_decode($response, true);
