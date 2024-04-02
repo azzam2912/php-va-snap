@@ -32,7 +32,9 @@ Mxz+iuYBDeqRKo3q9Du8lzaaEzXu
 ';
 $clientSecret = 'SK-PFACMl2FMX2WltdcuZes';
 $timestamp = getTimestamp();
+echo "Timestamp: " . $timestamp;
 $signature = generateSignature($clientKey, $timestamp, $privateKey);
+echo "Generated Signature: " . $signature;
 $cimbvaModel = new CIMBVAModel($baseUrl);
 
 $accessTokenResponse = $cimbvaModel->getAccessToken($baseUrl, $clientKey, $signature);

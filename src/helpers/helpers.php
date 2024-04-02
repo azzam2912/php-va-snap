@@ -2,7 +2,13 @@
 
 function getTimestamp()
 {
-    return gmdate('Y-m-d\TH:i:s\Z');
+    return generateTimestampWithOffset();
+}
+
+function generateTimestampWithOffset($offset = '+07:00') {
+  $timestamp = new DateTime('now');
+  $timestamp->setTimezone(new DateTimeZone($offset));
+  return $timestamp->format('Y-m-d\TH:i:s\Z');
 }
 
 function getExternalId()
