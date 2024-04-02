@@ -13,8 +13,8 @@ function getExternalId()
 function getCreateVARequestBody()
 {
     return json_encode([
-        'partnerServiceId' => getPartnerServiceId(), // From config.php
-        'trxId' => getInvoiceNumber(), // Generate invoice number
+        'partnerServiceId' => getPartnerServiceId(),
+        'trxId' => getInvoiceNumber(),
         'virtualAccountTrxType' => 1,
         'totalAmount' => [
             'value' => '12500.00',
@@ -24,7 +24,7 @@ function getCreateVARequestBody()
             'value' => '1000.00',
             'currency' => 'IDR',
         ],
-        'expiredDate' => getExpiredDate(), // Generate expired date
+        'expiredDate' => getExpiredDate(),
         'virtualAccountName' => 'T_' . time(),
         'virtualAccountEmail' => 'test.cimb.' . time() . '@test.com',
         'virtualAccountPhone' => '628' . time(),
@@ -74,8 +74,8 @@ function getReferenceNo()
 
 function normalizeVaNumberSnapForAcq($acquirerBinLength)
 {
-    $partnerServiceId = getPartnerServiceId(); // From config.php
-    $customerNo = getCustomerNo(); // From config.php
+    $partnerServiceId = getPartnerServiceId(); 
+    $customerNo = getCustomerNo(); 
     $paycodeLength = 16;
 
     if (strlen($partnerServiceId) > $acquirerBinLength) {
@@ -107,7 +107,7 @@ function generateSignatureForGetToken($clientKey, $privateKey)
         ]),
     ];
 
-    $signature = generateSignature($data, $privateKey);
+    $signature = '';;
 
     return $signature;
 }
@@ -121,14 +121,14 @@ function generateSignatureForCreateVA($clientKey, $clientSecret)
         'body' => getCreateVARequestBody(),
     ];
 
-    $signature = generateSignature($data, $clientSecret);
+    $signature = '';
 
     return $signature;
 }
 
 function generateSignatureForInquiry($clientKey, $clientSecret)
 {
-    $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); // Acquirer bin length is 4
+    $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); 
     $partnerServiceId = $normalizedVaNumber['partnerServiceId'];
     $customerNo = $normalizedVaNumber['customerNo'];
     $virtualAccountNo = $normalizedVaNumber['virtualAccountNo'];
@@ -150,18 +150,18 @@ function generateSignatureForInquiry($clientKey, $clientSecret)
         ]),
     ];
 
-    $signature = generateSignature($data, $clientSecret);
+    $signature = '';
 
     return $signature;
 }
 
 function generateSignatureForPayment($clientKey, $clientSecret)
 {
-    $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); // Acquirer bin length is 4
+    $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); 
     $partnerServiceId = $normalizedVaNumber['partnerServiceId'];
     $customerNo = $normalizedVaNumber['customerNo'];
     $virtualAccountNo = $normalizedVaNumber['virtualAccountNo'];
-    $virtualAccountName = getVirtualAccountName(); // From inquiry response
+    $virtualAccountName = getVirtualAccountName(); 
 
     $data = [
         'clientKey' => $clientKey,
@@ -191,24 +191,30 @@ function generateSignatureForPayment($clientKey, $clientSecret)
         ]),
     ];
 
-    $signature = generateSignature($data, $clientSecret);
+    $signature = '';
 
     return $signature;
 }
 
-function generateSignature($data, $secret)
+function generateSignature($clientId, $timestamp, $privateKey)
 {
-    ksort($data);
-    $canonicalString = http_build_query($data);
-    $signature = hash_hmac('sha256', $canonicalString, $secret);
+    $stringToSign = $clientId . ":" . $timestamp;
+    $signature = "";
 
-    return $signature;
+    // Calculate the signature using SHA256withRSA
+    $success = openssl_sign($stringToSign, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+
+    if ($success) {
+        return base64_encode($signature);
+    } else {
+        return false;
+    }
 }
 
 function getCreateVAMGPCRequestBody()
 {
-    $partnerServiceId = getPartnerServiceId(); // From config.php
-    $customerNo = getCustomerNo(); // From config.php
+    $partnerServiceId = getPartnerServiceId(); 
+    $customerNo = getCustomerNo(); 
 
     $acquirerBinLength = 4;
     $paycodeLength = 16;
@@ -288,14 +294,14 @@ function generateSignatureForCreateVAMGPC($clientKey, $clientSecret)
         'body' => getCreateVAMGPCRequestBody(),
     ];
 
-    $signature = generateSignature($data, $clientSecret);
+    $signature = '';
 
     return $signature;
 }
 
 function generateSignatureForInquiryDirect($clientKey, $clientSecret)
 {
-    $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); // Acquirer bin length is 4
+    $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); 
     $partnerServiceId = $normalizedVaNumber['partnerServiceId'];
     $customerNo = $normalizedVaNumber['customerNo'];
     $virtualAccountNo = $normalizedVaNumber['virtualAccountNo'];
@@ -310,9 +316,9 @@ function generateSignatureForInquiryDirect($clientKey, $clientSecret)
 function getCreateVABillVariableRequestBody()
 {
     return json_encode([
-        'partnerServiceId' => getPartnerServiceId(), // From config.php
+        'partnerServiceId' => getPartnerServiceId(), 
         'trxId' => getInvoiceNumber(),
-        'virtualAccountTrxType' => 8, // Bill Variable
+        'virtualAccountTrxType' => 8, 
         'totalAmount' => [
             'value' => '12500.00',
             'currency' => 'IDR',
@@ -362,7 +368,7 @@ function getCreateVABillVariableRequestBody()
 function getCreateVAMultiBillVariableRequestBody()
 {
     return json_encode([
-        'partnerServiceId' => getPartnerServiceId(), // From config.php
+        'partnerServiceId' => getPartnerServiceId(), 
         'trxId' => getInvoiceNumber(),
         'virtualAccountTrxType' => 9, // Multi Bill Variable
         'totalAmount' => [
@@ -436,7 +442,7 @@ function generateSignatureForCreateVABillVariable($clientKey, $clientSecret)
         'body' => getCreateVABillVariableRequestBody(),
     ];
 
-    $signature = generateSignature($data, $clientSecret);
+    $signature = '';
 
     return $signature;
 }
@@ -450,18 +456,18 @@ function generateSignatureForCreateVAMultiBillVariable($clientKey, $clientSecret
         'body' => getCreateVAMultiBillVariableRequestBody(),
     ];
 
-    $signature = generateSignature($data, $clientSecret);
+    $signature = '';
 
     return $signature;
 }
 
 function generateSignatureForReversePayment($clientKey, $clientSecret, $paymentRequestId)
 {
-    $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); // Acquirer bin length is 4
+    $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); 
     $partnerServiceId = $normalizedVaNumber['partnerServiceId'];
     $customerNo = $normalizedVaNumber['customerNo'];
     $virtualAccountNo = $normalizedVaNumber['virtualAccountNo'];
-    $virtualAccountName = getVirtualAccountName(); // From inquiry response
+    $virtualAccountName = getVirtualAccountName(); 
 
     $data = [
         'clientKey' => $clientKey,
@@ -483,7 +489,7 @@ function generateSignatureForReversePayment($clientKey, $clientSecret, $paymentR
         ]),
     ];
 
-    $signature = generateSignature($data, $clientSecret);
+    $signature = '';
 
     return $signature;
 }

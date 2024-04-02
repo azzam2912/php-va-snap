@@ -1,5 +1,4 @@
 <?php
-
 function getBaseUrl()
 {
     return 'https://api-uat.doku.com';
@@ -7,7 +6,7 @@ function getBaseUrl()
 
 function getClientKey()
 {
-    return '';
+    return 'BRN-0217-1711320632217';
 }
 
 function getPrivateKey()
@@ -17,7 +16,7 @@ function getPrivateKey()
 
 function getClientSecret()
 {
-    return '';
+    return 'SK-p88Dfssq6TCAbVAMe3qC';
 }
 
 function getAcquirerClientKey()

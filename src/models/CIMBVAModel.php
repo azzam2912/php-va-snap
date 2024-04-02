@@ -4,9 +4,9 @@ class CIMBVAModel
 {
     private $baseUrl;
 
-    public function __construct()
+    public function __construct($baseUrl)
     {
-        $this->baseUrl = getBaseUrl(); // From config.php
+        $this->baseUrl = $baseUrl; 
     }
 
     public function getTokenForMerchant($clientKey, $signature)
@@ -39,6 +39,34 @@ class CIMBVAModel
         $body = getCreateVARequestBody(); // From helpers.php
 
         return $this->makeRequest('POST', $url, $headers, $body);
+    }
+
+    function getAccessToken($clientKey, $privateKey)
+    {
+        $url = "{{base_url_api}}/authorization/v1/access-token/b2b";
+        $data = array(
+            "grantType" => "client_credentials",
+            "additionalInfo" => array()
+        );
+        $timestamp = getTimestamp();
+        $headers = array(
+            "X-CLIENT-KEY: " . $clientKey,
+            "X-TIMESTAMP: " . getTimestamp(),
+            "X-SIGNATURE: " . generateSignature($clientKey, $timestamp, $privateKey)
+        );
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $responseData = json_decode($response, true);
+        return $responseData;
     }
 
     // Add other methods for inquiry and payment
