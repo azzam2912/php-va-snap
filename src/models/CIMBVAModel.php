@@ -1,5 +1,6 @@
 <?php
 
+require_once('src/helpers/helpers.php');
 class CIMBVAModel
 {
     private $baseUrl;
@@ -25,33 +26,32 @@ class CIMBVAModel
         return $this->makeRequest('POST', $url, $headers, $body);
     }
 
-    public function createVA($clientKey, $accessToken, $signature)
+    public function createVA($clientKey, $accessToken, $signature, $timestamp)
     {
+        $externalId = getExternalId(); //'RID_C_20240404104404355';
         $url = $this->baseUrl . '/bi-snap-va/cimb/v1/transfer-va/create-va';
-        $headers = [
+        $headers = array(
+            "Content-Type: application/json",
             'X-PARTNER-ID: ' . $clientKey,
-            'X-EXTERNAL-ID: ' . getExternalId(), // From helpers.php
-            'X-TIMESTAMP: ' . getTimestamp(),
+            'X-EXTERNAL-ID: ' . $externalId, // From helpers.php
+            'X-TIMESTAMP: ' . $timestamp,
             'X-SIGNATURE: ' . $signature,
-            'Authorization: Bearer ' . $accessToken,
-            'CHANNEL-ID: VA011',
-        ];
-        $body = getCreateVARequestBody(); // From helpers.php
+            'Authorization:Bearer ' . $accessToken,
+            'CHANNEL-ID: VA009'
+        );
+        print_r($headers);
+        echo "\n\n top is headers \n\n";
+        $body = getCreateVAMGPCRequestBody(); // From helpers.php
 
         return $this->makeRequest('POST', $url, $headers, $body);
     }
 
-    function getAccessToken($url, $clientKey, $signature)
+    function getAccessToken($url, $clientKey, $signature, $timestamp)
     {
         $url = $url . "/authorization/v1/access-token/b2b";
-        $data = array(
-            "grantType" => "client_credentials",
-            "additionalInfo" => array()
-        );
-        $timestamp = getTimestamp();
         $headers = array(
             "X-CLIENT-KEY: " . $clientKey,
-            "X-TIMESTAMP: " . getTimestamp(),
+            "X-TIMESTAMP: " . $timestamp,
             "X-SIGNATURE: " . $signature
         );
 
@@ -77,15 +77,17 @@ class CIMBVAModel
             CURLOPT_POSTFIELDS => $body,
         ]);
 
+        //echo "[function CIMBVAModel makeRequest : $ curl before ] " . $curl . "\n\n";
+
         $response = curl_exec($curl);
         $error = curl_error($curl);
 
-        echo "response " . $response;
+        echo "[function CIMBVAModel makeRequest : $ response ] " . $response . "\n\n";
+        //echo "[function CIMBVAModel makeRequest : $ curlafter ] " . $curl . "\n\n";
 
         curl_close($curl);
 
         if ($error) {
-            echo "ERRORRRR";
             return ['error' => $error];
 
         }

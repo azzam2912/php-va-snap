@@ -1,19 +1,22 @@
 <?php
 
-function getTimestamp()
+require_once('src/config/config.php');
+
+function getTimestamp($offset = true)
 {
-    return generateTimestampWithOffset();
+    if($offset) return generateTimestampWithOffset();
+    return generateTimestampWithOffset('+00:00');
 }
 
 function generateTimestampWithOffset($offset = '+07:00') {
   $timestamp = new DateTime('now');
   $timestamp->setTimezone(new DateTimeZone($offset));
-  return $timestamp->format('Y-m-d\TH:i:s+07:00');
+  return $timestamp->format('Y-m-d\TH:i:s'.$offset);
 }
 
 function getExternalId()
 {
-    return 'RID_C_' . '20240326101849971';
+    return 'RID_C_' . '20240404111958408';
 }
 
 function getCreateVARequestBody()
@@ -78,29 +81,30 @@ function getReferenceNo()
     return substr(str_replace('.', '', microtime(true)), 0, 10);
 }
 
-function normalizeVaNumberSnapForAcq($acquirerBinLength)
+function normalizeVaNumberSnapForAcq($acquirerBinLength, $paycodeLength)
 {
-    $partnerServiceId = getPartnerServiceId(); 
+    $invoiceNumber = "INV_CIMB_" . date('YmdHis');
+    $partnerServiceIdGenerated = getPartnerServiceId(); 
     $customerNo = getCustomerNo(); 
-    $paycodeLength = 16;
 
-    if (strlen($partnerServiceId) > $acquirerBinLength) {
-        $partnerServiceId = substr($partnerServiceId, 0, $acquirerBinLength);
-    } else {
-        $partnerServiceId = str_pad($partnerServiceId, $acquirerBinLength, '0', STR_PAD_LEFT);
-    }
+    // if (strlen($partnerServiceIdGenerated) > $acquirerBinLength) {
+    //     $partnerServiceIdGenerated = substr($partnerServiceIdGenerated, 0, $acquirerBinLength);
+    // } else {
+    //     $partnerServiceIdGenerated = str_pad($partnerServiceIdGenerated, $acquirerBinLength, '0', STR_PAD_LEFT);
+    // }
 
-    $customerNoLength = $paycodeLength - strlen($partnerServiceId);
-    $customerNo = str_pad($customerNo, $customerNoLength, '0', STR_PAD_LEFT);
-
-    $virtualAccountNo = $partnerServiceId . $customerNo;
+    $customerNoLength = $paycodeLength - strlen($partnerServiceIdGenerated);
+    $customerNoGenerated = substr(str_pad(time(), 10, '0', STR_PAD_LEFT), 0, $customerNoLength);
+    $virtualAccountNoGenerated = $partnerServiceIdGenerated . $customerNoGenerated;
 
     return [
-        'partnerServiceId' => $partnerServiceId,
-        'customerNo' => $customerNo,
-        'virtualAccountNo' => $virtualAccountNo,
+        'partnerServiceId' => $partnerServiceIdGenerated,
+        'customerNo' => $customerNoGenerated,
+        'virtualAccountNo' => $virtualAccountNoGenerated,
+        'invoiceNumber' => $invoiceNumber
     ];
 }
+
 
 function generateSignatureForGetToken($clientKey, $privateKey)
 {
@@ -204,7 +208,8 @@ function generateSignatureForPayment($clientKey, $clientSecret)
 
 function generateSignature($clientId, $timestamp, $privateKey)
 {
-    $stringToSign = $clientId . ":" . $timestamp;
+    $stringToSign = $clientId . "|" . $timestamp;
+    echo "[helpers.php generateSignature $ stringToSign] " . $stringToSign . "\n\n";
     $signature = "";
 
     // Calculate the signature using SHA256withRSA
@@ -219,28 +224,22 @@ function generateSignature($clientId, $timestamp, $privateKey)
 
 function getCreateVAMGPCRequestBody()
 {
-    $partnerServiceId = getPartnerServiceId(); 
-    $customerNo = getCustomerNo(); 
 
     $acquirerBinLength = 4;
     $paycodeLength = 16;
+    $variables = normalizeVaNumberSnapForAcq($acquirerBinLength, $paycodeLength);
+    $partnerServiceId = $variables['partnerServiceId'];
+    $customerNo = $variables['customerNo'];
+    $virtualAccountNo = $variables['virtualAccountNo'];
+    $invoiceNumber = $variables['invoiceNumber'];
+    $uniqueId = '20240404085435';
+    $expiredDate = getExpiredDate();
 
-    if (strlen($partnerServiceId) > $acquirerBinLength) {
-        $partnerServiceId = substr($partnerServiceId, 0, $acquirerBinLength);
-    } else {
-        $partnerServiceId = str_pad($partnerServiceId, $acquirerBinLength, '0', STR_PAD_LEFT);
-    }
-
-    $customerNoLength = $paycodeLength - strlen($partnerServiceId);
-    $customerNo = str_pad($customerNo, $customerNoLength, '0', STR_PAD_LEFT);
-
-    $virtualAccountNo = $partnerServiceId . $customerNo;
-
-    return json_encode([
+    $encodedJSON = json_encode([
         'partnerServiceId' => $partnerServiceId,
         'customerNo' => $customerNo,
         'virtualAccountNo' => $virtualAccountNo,
-        'trxId' => getInvoiceNumber(),
+        'trxId' => $invoiceNumber,
         'virtualAccountTrxType' => 1,
         'totalAmount' => [
             'value' => '12500.00',
@@ -250,7 +249,7 @@ function getCreateVAMGPCRequestBody()
             'value' => '1000.00',
             'currency' => 'IDR',
         ],
-        'expiredDate' => getExpiredDate(),
+        'expiredDate' => $expiredDate,
         'virtualAccountName' => 'T_' . time(),
         'virtualAccountEmail' => 'test.btn.' . time() . '@test.com',
         'virtualAccountPhone' => '628' . time(),
@@ -269,7 +268,7 @@ function getCreateVAMGPCRequestBody()
                     'value' => '20000.00',
                     'currency' => 'IDR',
                 ],
-                'additionalInfo' => [],
+                'additionalInfo' => new stdClass(),
             ],
         ],
         'freeTexts' => [
@@ -279,17 +278,22 @@ function getCreateVAMGPCRequestBody()
             ],
         ],
         'additionalInfo' => [
-            'deviceId' => '12345679237 ' . uniqid(),
-            'channel' => 'mobilephone ' . uniqid(),
+            'deviceId' => '12345679237 ' . $uniqueId,
+            'channel' => 'mobilephone ' . $uniqueId,
         ],
     ]);
+    echo "Encoded JSON: " . $encodedJSON . "\n\n";
+    return $encodedJSON;
 }
 
-function getExpiredDate()
+function getExpiredDate($offset = '+07:00', $expiredDays = '14')
 {
-    $expiredDays = 14; // Expired in 14 days for MGPC
-    return date('Y-m-d\TH:i:s\Z', strtotime('+' . $expiredDays . ' days'));
+    $timestamp = new DateTime('now');
+    $timestamp->setTimezone(new DateTimeZone($offset));
+    $timestamp->add(new DateInterval('P'.$expiredDays.'D'));
+    return $timestamp->format('Y-m-d\TH:i:s'.$offset);
 }
+
 
 function generateSignatureForCreateVAMGPC($clientKey, $clientSecret)
 {
@@ -469,7 +473,7 @@ function generateSignatureForCreateVAMultiBillVariable($clientKey, $clientSecret
 
 function generateSignatureForReversePayment($clientKey, $clientSecret, $paymentRequestId)
 {
-    $normalizedVaNumber = normalizeVaNumberSnapForAcq(4); 
+    $normalizedVaNumber = normalizeVaNumberSnapForAcq(4, 16); 
     $partnerServiceId = $normalizedVaNumber['partnerServiceId'];
     $customerNo = $normalizedVaNumber['customerNo'];
     $virtualAccountNo = $normalizedVaNumber['virtualAccountNo'];

@@ -1,11 +1,11 @@
 <?php
 
 require_once('src/models/CIMBVAModel.php');
-require_once('src/helpers/helpers.php');
+
 
 $baseUrl = 'https://api-uat.doku.com';
-$clientKey = 'BRN-0217-1711320632217'; // It is actually a client ID
-$privateKey = '-----BEGIN PRIVATE KEY-----
+$clientKey = 'BRN-0248-1674717085445'; // It is actually a client ID
+$privateKey = "-----BEGIN PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCH2013jxHy1agi5nueS2D8pH5y
 CHplzIj93xWYhxeNDIguBN6XZRuauHG3rfRRGH/ALohIY5b9lonUQBTwvgfGO4tnwai6VsdetH5a
 GUcGwa59iZh5TIgUdqp187CDAqJDYu0ere2jxYMzTAJZKpTrSfe/ifhCVB1ACM7b0aQ8dE3FeUhc
@@ -29,32 +29,34 @@ VwyeSQKBgCZXrvUPIQAHNtfi58EVCDYBhZK/e0KhZIZxiNSW7aGPYUCt+WundSgNZE2In45AnmbB
 PIlKe0aPF/zgMzRJoi2vnfNzG8Lo6kd6ACP9UGs763VZ96M2b3fqahpZIcui6FaF+6XdK41Kls8t
 Mxz+iuYBDeqRKo3q9Du8lzaaEzXu
 -----END PRIVATE KEY-----
-';
-$clientSecret = 'SK-PFACMl2FMX2WltdcuZes';
-$timestamp = getTimestamp();
-echo "Timestamp: " . $timestamp . "\n";
-$signature = generateSignature($clientKey, $timestamp, $privateKey);
-echo "Generated Signature: " . $signature . "\n";
-$cimbvaModel = new CIMBVAModel($baseUrl);
+";
 
-$accessTokenResponse = $cimbvaModel->getAccessToken($baseUrl, $clientKey, $signature);
+// $clientSecret = 'SK-PFACMl2FMX2WltdcuZes';
+$timestamp = getTimestamp(true);
+echo "Timestamp: " . $timestamp . "\n\n";
+
+$signature = generateSignature($clientKey, $timestamp, $privateKey);
+echo "Generated Signature: " . $signature . "\n\n";
+
+$cimbvaModel = new CIMBVAModel($baseUrl);
+$accessTokenResponse = $cimbvaModel->getAccessToken($baseUrl, $clientKey, $signature, $timestamp);
 
 if (isset($accessTokenResponse['error'])) 
 {
-  echo "Error getting access token: " . $accessTokenResponse['error'] . "\n";
+  echo "Error getting access token: " . $accessTokenResponse['error'] . "\n\n";
   exit;
 }
 
 $accessToken = $accessTokenResponse['accessToken'];
-echo "The Access Token is: " . $accessToken . "\n";
+echo "The Access Token is: " . $accessToken . "\n\n";
 
-$createVAResponse = $cimbvaModel->createVA('BRN-0248-1674717085445', $accessToken, $signature);
+$createVAResponse = $cimbvaModel->createVA($clientKey, $accessToken, $signature, $timestamp);
 
 if (isset($createVAResponse['error'])) {
-  echo "Error creating VA: " . $createVAResponse['error'] . "\n";
+  echo "Error creating VA: " . $createVAResponse['error'] . "\n\n";
   exit;
 }
 
-$vaNumber = $createVAResponse['virtualAccountNumber'];
+$vaNumber = $createVAResponse['virtualAccountData']['virtualAccountNo'];
 echo "Successfully created VA with number: " . $vaNumber;
 
